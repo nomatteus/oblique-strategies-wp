@@ -33,41 +33,20 @@ function oblique_admin() {
 function oblique_css() {
 
 	echo '<style type="text/css">
-	#oblique-stragegy {
-		position: relative;
-		margin: 0 0 0 50px;
-		padding: 13px 0;
-		font-size: 20px;
-		float:left;
-		text-shadow: 1px 1px 1px #ffffff;
-		min-width: 100px
-	}
-	#oblique-stragegy a {
-		position:absolute;
-		bottom:-2px;
-		right:-10px;
-		font-size:8px;
-		color:white;
-		text-shadow: 1px 1px 1px #444444;
-	}
+	
+		#oblique-stragegy {position: relative; margin: 0 0 0 50px; padding: 13px 0; font-size: 20px; float:left;
+			text-shadow: 1px 1px 1px #ffffff; min-width: 100px; }
+
+		#oblique-stragegy a {position:absolute; bottom:-2px; right:-10px; font-size:8px; color:white;
+			text-shadow: 1px 1px 1px #444444; }
+		
 	</style>';
 }
 
-//add_action('admin_footer', 'oblique_admin');
+// Adds to admin html header
 add_action('in_admin_header', 'oblique_admin');
 
-add_action("admin_head", "oblique_css"); // admin_head
+// Adds to admin <head>
+add_action("admin_head", "oblique_css");
 
-/* These functions will help us. ...... or not*/
-/*function get_oblique_strategies($howmany) {
-	$strategies = array();
-	for ($i=0; $i < $howmany; $i++) {
-		// Get a random index # for oblique strategy
-		$rand = mt_rand(0, $num_oblique - 1);
-		$strategies[] = $oblique_strategies[$rand];
-	}
-	// Return string for a single strategy, or an array of strings for > 1
-	return ($howmany == 1) ? $strategies[0] : $strategies;
 
-}
-*/
