@@ -26,11 +26,19 @@ function random_oblique_strategies($quantity = 1) {
 }
 
 
+$options = get_option("oblique_options");
+
+
+
+
+/*************************************************
+ * Admin Header Display
+ *************************************************/
 function oblique_admin() {
 	echo '<div id="oblique-stragegy"><a href="" target="_blank">Oblique Strategy</a>' . random_oblique_strategies() . '</div>';
 }
 
-function oblique_css() {
+function oblique_admin_css() {
 
 	echo '<style type="text/css">
 	
@@ -43,10 +51,141 @@ function oblique_css() {
 	</style>';
 }
 
-// Adds to admin html header
-add_action('in_admin_header', 'oblique_admin');
+// Check for negative of 'No' so if the option doesn't exist it will default to Yes
+if ($options['admin_showinheader'] != 'No') {
+	// Adds to admin html header
+	add_action('in_admin_header', 'oblique_admin');
 
-// Adds to admin <head>
-add_action("admin_head", "oblique_css");
+	// Adds to admin <head>
+	add_action("admin_head", "oblique_admin_css");
+}
+
+
+
+
+
+/*************************************************
+ * Admin Options Panel
+ * 
+ * Using new Settings API (as of WordPress 2.7)
+ * See: http://codex.wordpress.org/Settings_API
+ *************************************************/
+
+function oblique_admin_menu() {
+	add_options_page("Oblique Strategies Options", "Oblique Strategies", "manage_options", "oblique-strategies", "oblique_plugin_options");
+	//add_menu_page("Oblique Strategies Options", "Oblique Strategies", "administrator", __FILE__, "oblique_plugin_options");
+}
+
+function oblique_plugin_options() {
+	if (!current_user_can("manage_options")) {
+		wp_die(__("You do not have sufficient permissions to access this page"));
+	}
+	
+	?>
+	<div class="wrap">
+		<h2>My Plugin Options</h2>
+		<p>Hey! Welcome....</p>
+		<form method="post" action="options.php">
+			<?php settings_fields("oblique_options_group"); ?>
+			<?php do_settings_sections("oblique_strategies"); ?>
+			
+			<input name="Submit" type="submit" value="<?php esc_attr_e('Save Changes'); ?>" />
+		</form>
+	</div>
+	<?php
+}
+
+add_action("admin_menu", "oblique_admin_menu");
+
+
+
+function oblique_admin_init() {
+	register_setting(
+			"oblique_options_group", // option group
+			"oblique_options", // option name -- this is the name stored in the DB
+			"oblique_options_validate" // sanitization callback
+			);
+	add_settings_section(
+			"oblique_main", // section id (for use in id attribute in tags)
+			"Main OB Settings", // section title (displayed)
+			"oblique_main_text", // callback for section text (i.e. description)
+			"oblique_strategies" // page to show settings on (referenced in do_settings_sections())
+			);
+	add_settings_field(
+			"oblique_admin_showinheader", // field id for use in 'id' attribute in tags
+			"Show in admin header?", // option title (displayed)
+			"oblique_setting_admin_showinheader", // callback for option content (i.e. form field)
+			"oblique_strategies", // page to show option on
+			"oblique_main" // section id to display in
+			);
+}
+
+function oblique_main_text() {
+	echo "<p>section description</p>";
+}
+
+function oblique_setting_admin_showinheader() {
+	$options = get_option("oblique_options");
+	
+	?>
+	<select name="oblique_options[admin_showinheader]" id="oblique_admin_showinheader">
+		<option value="Yes" <?php echo ($options['admin_showinheader'] == "Yes") ? 'selected="selected"' : ''; ?>>Yes</option>
+		<option value="No" <?php echo ($options['admin_showinheader'] == "No") ? 'selected="selected"' : ''; ?>>No</option>
+	</select>
+	<?php
+	
+	//echo '<input id="oblique_admin_showinheader" name="oblique_options[admin_showinheader]" size="40" type="text" value="' . $options['admin_showinheader'] . '" />';
+}
+
+// Sanitize/validate input. Input is an array, returns validated array
+function oblique_options_validate($input) {
+	/*
+	
+	$newinput['text_anoption'] = trim($input['text_anoption']);
+	if (!preg_match('/^[a-z0-9]{1,32}$/i', $newinput['text_anoption'])) {
+		$newinput['text_anoption'] = '';
+	}
+	return $newinput;
+	
+	*/
+	// Gets all options from database
+	$options = get_option('oblique_options');
+	
+	/* Now we just replace the ones we want to update, and the rest will stay the same */
+	
+	// text_anoption
+	/*$options['admin_showinheader'] = trim($input['admin_showinheader']);
+	if(!preg_match('/^[a-z0-9]{0,32}$/i', $options['admin_showinheader'])) {
+		$options['admin_showinheader'] = '';
+	}*/
+	
+	
+	$options['admin_showinheader'] = ($input['admin_showinheader'] == "No") ? "No" : "Yes";
+	
+	
+	return $options;
+	
+	
+}
+
+add_action("admin_init", "oblique_admin_init");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
